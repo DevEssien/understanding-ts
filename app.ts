@@ -1,10 +1,8 @@
-const combine = (n1: number | string, n2: number | string) => {
-  let result;
-  if (typeof n1 === "number" && typeof n2 === "number") return n1 + n2;
-  else return n1.toString() + n2.toString();
-};
+//FUNCTIONS AND CALLBACK
 
-const combineNum = combine(2, 4);
-const combineStr = combine("As", "Nort");
-console.log(combineNum);
-console.log(combineStr);
+const addAndHandle = (n1: number, n2: number, cb: (result: number) => void) => {
+    const result = n1 + n2;
+     cb(result);
+}
+
+addAndHandle(2, 4, (result) => console.log(result));
