@@ -8,9 +8,6 @@ class Department {
         this.id = id;
         this.name = n;
     }
-    describe() {
-        console.log("This is the department of ", this.name);
-    }
     addEmployee(employee) {
         this.employees.push(employee);
     }
@@ -24,6 +21,9 @@ class ITDepartment extends Department {
     constructor(id, admins = []) {
         super(id, "IT");
         this.admins = admins;
+    }
+    describe() {
+        console.log("This is the department of ", this.name, this.id);
     }
 }
 class AccountingDepartment extends Department {
@@ -42,6 +42,9 @@ class AccountingDepartment extends Department {
         this.reports = reports;
         this.lastReport = reports[0];
     }
+    describe() {
+        console.log("This is the department of ", this.name);
+    }
     addEmployee(name) {
         if (name.toLowerCase() === "max")
             return;
@@ -56,8 +59,6 @@ class AccountingDepartment extends Department {
         console.log(this.reports);
     }
 }
-const employee = Department.createEmployee('Emris');
-console.log(employee, Department.ficalYear);
-const accounting = new AccountingDepartment("63ah4nbc93d3rm");
-accounting.printReport();
+const itDep = new ITDepartment('diteot');
+itDep.describe();
 //# sourceMappingURL=app.js.map

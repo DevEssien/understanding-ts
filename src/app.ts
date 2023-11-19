@@ -1,7 +1,7 @@
-class Department {
+abstract class Department {
   static ficalYear = 2020;
 
-  private readonly id: string;
+  protected readonly id: string;
   name: string;
   protected employees: string[] = [];
 
@@ -14,21 +14,27 @@ class Department {
     this.name = n;
     // console.log(Department.ficalYear)
   }
-  describe(this: Department) {
-    console.log("This is the department of ", this.name);
-  }
+
+  abstract describe(this: Department): void;
+
   addEmployee(employee: string) {
     this.employees.push(employee);
   }
+
   printEmployeeInfo(this: Department) {
     console.log("employee length ", this.employees.length);
     console.log(this.employees);
   }
 }
 
+
 class ITDepartment extends Department {
   constructor(id: string, public admins: string[] = []) {
     super(id, "IT");
+  }
+  describe(this: ITDepartment) {
+          console.log("This is the department of ", this.name, this.id);
+
   }
 }
 
@@ -49,21 +55,25 @@ class AccountingDepartment extends Department {
     super(id, "Accounting");
     this.lastReport = reports[0];
   }
+
+  describe(this: AccountingDepartment) {
+    console.log("This is the department of ", this.name);
+  }
+
   addEmployee(name: string) {
     if (name.toLowerCase() === "max") return;
     else this.employees.push(name);
   }
+
   addReport(this: AccountingDepartment, text: string) {
     this.reports.push(text);
     this.lastReport = text;
   }
+
   printReport(this: AccountingDepartment) {
     console.log(this.reports);
   }
 }
 
-const employee = Department.createEmployee('Emris');
-console.log(employee, Department.ficalYear)
-const accounting = new AccountingDepartment("63ah4nbc93d3rm");
-
-accounting.printReport();
+const itDep = new ITDepartment('diteot');
+itDep.describe();
