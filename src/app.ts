@@ -1,11 +1,18 @@
 class Department {
+  static ficalYear = 2020;
+
   private readonly id: string;
   name: string;
   protected employees: string[] = [];
 
+  static createEmployee(name: string) {
+    return { name };
+  }
+
   constructor(id: string, n: string) {
     this.id = id;
     this.name = n;
+    // console.log(Department.ficalYear)
   }
   describe(this: Department) {
     console.log("This is the department of ", this.name);
@@ -34,7 +41,7 @@ class AccountingDepartment extends Department {
   }
 
   set mostRecentReport(value: string) {
-    if (!value) throw new Error('please pass in a valid value');
+    if (!value) throw new Error("please pass in a valid value");
     this.addReport(value);
   }
 
@@ -55,13 +62,8 @@ class AccountingDepartment extends Department {
   }
 }
 
-// Accounting.addEmployee('Max');
-// Accounting.addEmployee('Jeff Cant')
-// Accounting.printEmployeeInfo();
-
+const employee = Department.createEmployee('Emris');
+console.log(employee, Department.ficalYear)
 const accounting = new AccountingDepartment("63ah4nbc93d3rm");
-accounting.mostRecentReport = 'we are still working on the end of years report from the department of accounting';  //we execute the set method as a property and not as a method
-accounting.addReport("this is another report from the bad man pablo gang");
-console.log(accounting.mostRecentReport);
-console.log("accounting ", accounting);
+
 accounting.printReport();

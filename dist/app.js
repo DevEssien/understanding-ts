@@ -1,5 +1,8 @@
 "use strict";
 class Department {
+    static createEmployee(name) {
+        return { name };
+    }
     constructor(id, n) {
         this.employees = [];
         this.id = id;
@@ -16,6 +19,7 @@ class Department {
         console.log(this.employees);
     }
 }
+Department.ficalYear = 2020;
 class ITDepartment extends Department {
     constructor(id, admins = []) {
         super(id, "IT");
@@ -30,7 +34,7 @@ class AccountingDepartment extends Department {
     }
     set mostRecentReport(value) {
         if (!value)
-            throw new Error('please pass in a valid value');
+            throw new Error("please pass in a valid value");
         this.addReport(value);
     }
     constructor(id, reports = []) {
@@ -52,10 +56,8 @@ class AccountingDepartment extends Department {
         console.log(this.reports);
     }
 }
+const employee = Department.createEmployee('Emris');
+console.log(employee, Department.ficalYear);
 const accounting = new AccountingDepartment("63ah4nbc93d3rm");
-accounting.mostRecentReport = 'we are still working on the end of years report from the department of accounting';
-accounting.addReport("this is another report from the bad man pablo gang");
-console.log(accounting.mostRecentReport);
-console.log("accounting ", accounting);
 accounting.printReport();
 //# sourceMappingURL=app.js.map
