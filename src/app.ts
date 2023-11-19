@@ -27,18 +27,17 @@ abstract class Department {
   }
 }
 
-
 class ITDepartment extends Department {
   constructor(id: string, public admins: string[] = []) {
     super(id, "IT");
   }
   describe(this: ITDepartment) {
-          console.log("This is the department of ", this.name, this.id);
-
+    console.log("This is the department of ", this.name, this.id);
   }
 }
 
 class AccountingDepartment extends Department {
+  private static instance: AccountingDepartment;
   private lastReport: string;
 
   get mostRecentReport() {
@@ -51,9 +50,15 @@ class AccountingDepartment extends Department {
     this.addReport(value);
   }
 
-  constructor(id: string, private reports: string[] = []) {
+  private constructor(id: string, private reports: string[] = []) {
     super(id, "Accounting");
     this.lastReport = reports[0];
+  }
+
+  static getInstance() {
+    if (AccountingDepartment.instance) return AccountingDepartment.instance;
+    this.instance = new AccountingDepartment('63dt2et3q53sg-gd', []);
+    return this.instance;
   }
 
   describe(this: AccountingDepartment) {
@@ -75,5 +80,5 @@ class AccountingDepartment extends Department {
   }
 }
 
-const itDep = new ITDepartment('diteot');
-itDep.describe();
+const accounting = AccountingDepartment.getInstance();
+console.log('accounting ', accounting)
