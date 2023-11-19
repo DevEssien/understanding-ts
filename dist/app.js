@@ -1,7 +1,8 @@
 "use strict";
 class Department {
-    constructor(n) {
+    constructor(id, n) {
         this.employees = [];
+        this.id = id;
         this.name = n;
     }
     describe() {
@@ -15,8 +16,29 @@ class Department {
         console.log(this.employees);
     }
 }
-const accounting = new Department('accounting');
-accounting.addEmployee('tony stark');
-accounting.addEmployee('Jeff Cant');
-accounting.printEmployeeInfo();
+class ITDepartment extends Department {
+    constructor(id, admins = []) {
+        super(id, 'IT');
+        this.admins = admins;
+    }
+}
+class AccountingDepartment extends Department {
+    constructor(id, reports = []) {
+        super(id, 'Accounting');
+        this.reports = reports;
+    }
+    addReport(text) {
+        this.reports.push(text);
+    }
+    printReport() {
+        console.log(this.reports);
+    }
+}
+const Accounting = new AccountingDepartment('63ah4nbc93d3rm');
+Accounting.addEmployee('tony stark');
+Accounting.addEmployee('Jeff Cant');
+Accounting.printEmployeeInfo();
+Accounting.addReport('this is another report from the bad man pablo gang');
+console.log('Accounting ', Accounting);
+Accounting.printReport();
 //# sourceMappingURL=app.js.map
