@@ -27,6 +27,12 @@ class AccountingDepartment extends Department {
         super(id, 'Accounting');
         this.reports = reports;
     }
+    addEmployee(name) {
+        if (name.toLowerCase() === 'max')
+            return;
+        else
+            this.employees.push(name);
+    }
     addReport(text) {
         this.reports.push(text);
     }
@@ -35,9 +41,8 @@ class AccountingDepartment extends Department {
     }
 }
 const Accounting = new AccountingDepartment('63ah4nbc93d3rm');
-Accounting.addEmployee('tony stark');
+Accounting.addEmployee('Max');
 Accounting.addEmployee('Jeff Cant');
-Accounting.printEmployeeInfo();
 Accounting.addReport('this is another report from the bad man pablo gang');
 console.log('Accounting ', Accounting);
 Accounting.printReport();
