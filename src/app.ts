@@ -1,40 +1,19 @@
-interface AddFn {
-    (a: number, b: number): number //anonymous function
+type Admin = {
+    name: string;
+    priviledges: string[];
 }
 
-let add: AddFn;
-
-add = (n1: number, n2: number) => {
-    return n1 + n2
-}
-console.log(add(3,5));
-
-interface Sex {
-    gender?: string; //gender is optional. optional === '?'
+type Employee = {
+    name: string;
+    startDate: Date;
 }
 
-interface Greetable extends Sex{
-    name?: string;
-    greet(phrase: string): void;
+type ElevatedEmployee = Admin & Employee;
+
+const e1: ElevatedEmployee = {
+    name: 'Max',
+    priviledges: ['create-server'],
+    startDate: new Date()
 }
 
-class Person implements Greetable {
-    name?: string;
-    gender = 'male';
-    age = 20;
-    constructor(name?: string) {
-        if (name) {
-            this.name = name;
-        }
-    }
-    greet(this: Person, phrase: string): void {
-        if (this.name) {
-            console.log(phrase, ' ', this.name)
-        } else {
-            console.log('Hi!')
-        }
-    }
-}
-
-const person = new Person('emrice');
-person.greet('Hi, my name is')
+console.log(e1)
