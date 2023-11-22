@@ -4,11 +4,12 @@ const e1 = {
     priviledges: ["create-server"],
     startDate: new Date(),
 };
-const sum = (a, b) => {
+function sum(a, b) {
     if (typeof a === "string" || typeof b === "string")
         return a.toString() + b.toString();
     return a + b;
-};
+}
+;
 const printEmployeeInfo = (employee) => {
     console.log(employee.name);
     if ("priviledges" in employee)

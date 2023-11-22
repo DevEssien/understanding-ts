@@ -24,7 +24,12 @@ const e1: ElevatedEmployee = {
   startDate: new Date(),
 };
 
-const sum = (a: Combinable, b: Combinable) => {
+//function overloads
+function sum(a: number, b: string): string;
+function sum(a: string, b: string): string;
+function sum(a: string, b: number): string;
+function sum(a: number, b: number): string;
+function sum(a: Combinable, b: Combinable) {
   if (typeof a === "string" || typeof b === "string")
     return a.toString() + b.toString();
   return a + b;
