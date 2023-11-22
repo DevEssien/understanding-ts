@@ -9,7 +9,7 @@
 //     data.toUpperCase()
 // })
 
-const mergeObject = <T, U>( obj1: T, obj2: U ) => {
+const mergeObject = <T extends object, U extends object>( obj1: T, obj2: U ) => {
     return { ...obj1, ...obj2 }
 }
 const obj = mergeObject({a: 2, b: 3}, {c: 3, d: 4});
