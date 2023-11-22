@@ -1,9 +1,7 @@
 "use strict";
-const inputElement = document.querySelector('input');
-inputElement.value = 'Hi there';
-const errorBag = {
-    email: 'No email provided',
-    username: 'Username must start with a character',
-    nationality: 'Nigeria'
+const mergeObject = (obj1, obj2) => {
+    return Object.assign(Object.assign({}, obj1), obj2);
 };
+const obj = mergeObject({ a: 2, b: 3 }, { c: 3, d: 4 });
+console.log(obj.c);
 //# sourceMappingURL=app.js.map
