@@ -66,3 +66,31 @@ const useVehicle = (vehicle: Vehicle) => {
   if ('loadCargo' in vehicle) vehicle.loadCargo()
 };
 useVehicle(new Car())
+
+// type guard continue
+
+interface Bird {
+  type: 'bird';
+  flyingSpeed: number;
+}
+
+interface Horse {
+  type: 'horse';
+  runningSpeed: number;
+}
+
+type Animal = Bird | Horse;
+
+const moveAnimal = (animal: Animal) => {
+  let speed: number;
+  switch (animal.type) {
+    case 'bird':
+      speed = animal.flyingSpeed
+      break;
+    case 'horse':
+      speed = animal.runningSpeed;
+      break;
+  }
+  console.log('moving at speed: ', speed)
+}
+moveAnimal({type: 'horse', runningSpeed: 4503})
