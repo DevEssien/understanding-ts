@@ -1,64 +1,136 @@
-// const list: Array<string> = []
+//  import 'reflect-metadata';
 
-// const promise: Promise<string>  = new Promise((resolve, reject) => {
-//     const r = 'red'
-//     if (r === 'red') resolve('red');
-// });
-
-// promise.then(data => {
-//     data.toUpperCase()
-// })
-
-// const mergeObject = <T extends object, U extends object>( obj1: T, obj2: U ) => {
-//     return { ...obj1, ...obj2 }
-// }
-// const obj = mergeObject({a: 2, b: 3}, {c: 3, d: 4});
-// console.log(obj.c)
-
-// interface Lengthy {
-//   length: number;
-// }
-
-// const countAndDescribe = <T extends Lengthy>(element: T): [T, string] => {
-//   let description = "Got no value";
-//   if (element.length === 1) description = "Got 1 element";
-//   else if (element.length > 1) description = `Got ${element.length} elements`;
-//   return [element, description];
-// };
-// console.log(countAndDescribe(["clear", "copy", "insert"]));
-
-// const extractAndConvert = <T extends object, U extends keyof T>(
-//   obj: T,
-//   key: U
-// ) => {
-//     return 'value ' + obj[key];
-// };
-// extractAndConvert({name: 'Max'}, 'name');
-
-
-class DataStorage<T extends string | number | boolean> {
-    private data: T[] = [];
-
-    addItem(item: T) {
-        this.data.push(item);
-    }
-
-    removeItem(item: T) {
-        if (this.data.indexOf(item) === -1) return
-        this.data.splice(this.data.indexOf(item), 1);
-    }
-
-    getItems() {
-        return [ ...this.data]
+const Logger = (logString: string) => {
+    return function(constructor: Function) {
+        console.log(logString)
+        console.log(constructor);
     }
 }
 
-const stringStorage = new DataStorage<string>();
-stringStorage.addItem('Max');
-stringStorage.addItem('Manu');
-stringStorage.removeItem('Manu');
-console.log(stringStorage.getItems());
+const WithTemplate = (template: string, hookId: string) => {
+    return function<T extends { new(...args: any[] ): { name: string} }>(originalConstructor: T) {
+        return class extends originalConstructor {
+            constructor(..._: any[]) {
+                super();
+                const hookElement  = document.querySelector(`#${hookId}`);
+                if (!hookElement) return;
+                hookElement.innerHTML = template;
+                hookElement.querySelector('h1')!.textContent = this.name;
+            }
+        }
+    }
+}
 
-const numberStorage = new DataStorage<number>();
-numberStorage.addItem(2);
-console.log(numberStorage.getItems());
+const Autobind = (_target: any, _methodName: string, descriptor: PropertyDescriptor) => {
+    const originalMethod = descriptor.value;
+    const  adjDescriptor  = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        }
+    }
+    return adjDescriptor ;
+}
+
+@WithTemplate('<h1>My first decorator factory function</h1>', 'app')
+class Person {
+    name = 'Max';
+
+    constructor() {
+        console.log('logging the person...')
+    }
+}
+
+class Printer {
+    message = 'This works';
+
+    @Autobind
+    showMessage() {
+        console.log(this.message);
+    }
+}
+
+const printer = new Printer()
+const button = document.querySelector('button');
+
+button?.addEventListener('click', printer.showMessage)
+// button?.addEventListener('click', printer.showMessage.bind(printer)) //using the bind(printer) it binds this explicitly to the printer class
+
+interface ValidatorConfig {
+    [property: string] : {
+        [validatorProp: string]: string[];
+    }
+}
+
+const registeredValidators: ValidatorConfig = {};
+
+function Required(target: any, propertyName: string) {
+    registeredValidators[target.constructor.name] = {
+        ...registeredValidators[target.constructor.name],
+        [propertyName]: ['required']
+    }
+}
+
+function PositiveNumber(target: any, propName: string) {
+    registeredValidators[target.constructor.name] = {
+        ...registeredValidators[target.constructor.name],
+        [propName]: ['positive']
+    }
+}
+
+function Validate(obj: any) {
+    const objValidatorConfig = registeredValidators[obj.constructor.name];
+    if (!objValidatorConfig) return true;
+
+    let isValid = true;
+
+    for (const prop in objValidatorConfig) {
+        for (const validator of  objValidatorConfig[prop]) {
+            switch (validator) {
+                case 'required' :
+                    isValid = isValid && !!obj[prop];
+                    break;
+                case 'positive':
+                    isValid = isValid && obj[prop] > 0;
+                    break
+            }
+        }
+    }
+    return isValid;
+}
+
+class Course {
+    @Required title: string;
+
+    @PositiveNumber price: number;
+
+    constructor(title: string, price: number) {
+        this.title = title;
+        this.price = price;
+    }
+}
+
+const form = document.querySelector('form')!;
+
+form?.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const titleElem = this.querySelector('#title')! as HTMLInputElement;
+    const priceElem = this.querySelector('#price')! as HTMLInputElement;
+    
+    const price = +priceElem?.value;
+    const title = titleElem?.value;
+
+    const createdCourse = new Course(title, price);
+    if (!Validate(createdCourse)) {
+        alert('- Invalid input');
+        return;
+    }
+    console.log(createdCourse, Validate(createdCourse));
+    const h1 = document.createElement('h1')! as HTMLHeadElement;
+
+    h1.innerText = `${title} is sold at the price of $${price}`;
+    document.body.append(h1)
+});
