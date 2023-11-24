@@ -60,4 +60,59 @@ __decorate([
 const printer = new Printer();
 const button = document.querySelector('button');
 button === null || button === void 0 ? void 0 : button.addEventListener('click', printer.showMessage);
+const registeredValidators = {};
+function Required(target, propertyName) {
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propertyName]: ['required'] });
+}
+function PositiveNumber(target, propName) {
+    registeredValidators[target.constructor.name] = Object.assign(Object.assign({}, registeredValidators[target.constructor.name]), { [propName]: ['positive'] });
+}
+function Validate(obj) {
+    const objValidatorConfig = registeredValidators[obj.constructor.name];
+    if (!objValidatorConfig)
+        return true;
+    let isValid = true;
+    for (const prop in objValidatorConfig) {
+        for (const validator of objValidatorConfig[prop]) {
+            switch (validator) {
+                case 'required':
+                    isValid = isValid && !!obj[prop];
+                    break;
+                case 'positive':
+                    isValid = isValid && obj[prop] > 0;
+                    break;
+            }
+        }
+    }
+    return isValid;
+}
+class Course {
+    constructor(title, price) {
+        this.title = title;
+        this.price = price;
+    }
+}
+__decorate([
+    Required
+], Course.prototype, "title", void 0);
+__decorate([
+    PositiveNumber
+], Course.prototype, "price", void 0);
+const form = document.querySelector('form');
+form === null || form === void 0 ? void 0 : form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const titleElem = this.querySelector('#title');
+    const priceElem = this.querySelector('#price');
+    const price = +(priceElem === null || priceElem === void 0 ? void 0 : priceElem.value);
+    const title = titleElem === null || titleElem === void 0 ? void 0 : titleElem.value;
+    const createdCourse = new Course(title, price);
+    if (!Validate(createdCourse)) {
+        alert('- Invalid input');
+        return;
+    }
+    console.log(createdCourse, Validate(createdCourse));
+    const h1 = document.createElement('h1');
+    h1.innerText = `${title} is sold at the price of $${price}`;
+    document.body.append(h1);
+});
 //# sourceMappingURL=app.js.map
