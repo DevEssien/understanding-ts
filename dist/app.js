@@ -25,6 +25,18 @@ const WithTemplate = (template, hookId) => {
         };
     };
 };
+const Autobind = (_target, _methodName, descriptor) => {
+    const originalMethod = descriptor.value;
+    const adjDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
+        }
+    };
+    return adjDescriptor;
+};
 let Person = class Person {
     constructor() {
         this.name = 'Max';
@@ -34,5 +46,18 @@ let Person = class Person {
 Person = __decorate([
     WithTemplate('<h1>My first decorator factory function</h1>', 'app')
 ], Person);
-const person = new Person();
+class Printer {
+    constructor() {
+        this.message = 'This works';
+    }
+    showMessage() {
+        console.log(this.message);
+    }
+}
+__decorate([
+    Autobind
+], Printer.prototype, "showMessage", null);
+const printer = new Printer();
+const button = document.querySelector('button');
+button === null || button === void 0 ? void 0 : button.addEventListener('click', printer.showMessage);
 //# sourceMappingURL=app.js.map
