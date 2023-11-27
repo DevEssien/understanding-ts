@@ -10,16 +10,18 @@ function validate(validateInput) {
     if (validateInput.required) {
         isValid = isValid && validateInput.value.toString().trim().length !== 0;
     }
-    if (validateInput.minLength != null && typeof validateInput.value === 'string') {
+    if (validateInput.minLength != null &&
+        typeof validateInput.value === "string") {
         isValid = isValid && validateInput.value.length >= validateInput.minLength;
     }
-    if (validateInput.maxLength != null && typeof validateInput.value === 'string') {
+    if (validateInput.maxLength != null &&
+        typeof validateInput.value === "string") {
         isValid = isValid && validateInput.value.length <= validateInput.maxLength;
     }
-    if (validateInput.min != null && typeof validateInput.value === 'number') {
+    if (validateInput.min != null && typeof validateInput.value === "number") {
         isValid = isValid && validateInput.value >= validateInput.min;
     }
-    if (validateInput.max != null && typeof validateInput.value === 'number') {
+    if (validateInput.max != null && typeof validateInput.value === "number") {
         isValid = isValid && validateInput.value <= validateInput.max;
     }
     return isValid;
@@ -33,6 +35,26 @@ function AutoBind(_target, _methodName, descriptor) {
             return originalMethod.bind(this);
         },
     };
+}
+class ProjectList {
+    constructor(type) {
+        this.type = type;
+        this.templateElement = (document.querySelector("#project-list"));
+        this.hostElement = document.querySelector("#app");
+        const importSectionElement = document.importNode(this.templateElement.content, true);
+        this.sectionElement = importSectionElement.firstElementChild;
+        this.sectionElement.id = `${type}-projects`;
+        this.render();
+        this.attachContent();
+    }
+    attachContent() {
+        const listId = `${this.type}-projects-list`;
+        this.sectionElement.querySelector('ul').id = listId;
+        this.sectionElement.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    render() {
+        this.hostElement.insertAdjacentElement("beforeend", this.sectionElement);
+    }
 }
 class ProjectInput {
     constructor() {
@@ -53,17 +75,17 @@ class ProjectInput {
         const enteredPeople = this.peopleInputElement.value;
         const titleValidate = {
             value: enteredTitle,
-            required: true
+            required: true,
         };
         const descriptionValidate = {
             value: enteredDescription,
             required: true,
-            minLength: 5
+            minLength: 5,
         };
         const peopleValidate = {
             value: +enteredPeople,
             required: true,
-            min: 1
+            min: 1,
         };
         if (!validate(titleValidate) ||
             !validate(descriptionValidate) ||
@@ -73,9 +95,9 @@ class ProjectInput {
             return [enteredTitle, enteredDescription, +enteredPeople];
     }
     clearInputs() {
-        this.titleInputElement.value = '';
-        this.descriptionInputElement.value = '';
-        this.peopleInputElement.value = '';
+        this.titleInputElement.value = "";
+        this.descriptionInputElement.value = "";
+        this.peopleInputElement.value = "";
     }
     submitHandler(event) {
         event.preventDefault();
@@ -97,4 +119,6 @@ __decorate([
     AutoBind
 ], ProjectInput.prototype, "submitHandler", null);
 const projectInput = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const finishedProjectList = new ProjectList('finished');
 //# sourceMappingURL=app.js.map
