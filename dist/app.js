@@ -5,18 +5,28 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var ProjectStatus;
+(function (ProjectStatus) {
+    ProjectStatus[ProjectStatus["ACTIVE"] = 0] = "ACTIVE";
+    ProjectStatus[ProjectStatus["FINISHED"] = 1] = "FINISHED";
+})(ProjectStatus || (ProjectStatus = {}));
+class Project {
+    constructor(id, title, description, people, status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.people = people;
+        this.status = status;
+    }
+}
 class ProjectState {
     constructor() {
         this.listeners = [];
         this.projects = [];
     }
     addProject(title, description, people) {
-        const newProject = {
-            id: Math.random().toString(),
-            title,
-            description,
-            people
-        };
+        const generatedId = Math.random().toString();
+        const newProject = new Project(generatedId, title, description, people, ProjectStatus.ACTIVE);
         this.projects.push(newProject);
         for (const listenerFn of this.listeners) {
             listenerFn(this.projects.slice());
@@ -82,17 +92,18 @@ class ProjectList {
         this.attachContent();
     }
     renderProjects() {
-        const listElem = document.querySelector(`#${this.type}-projects-list`);
+        const listElem = (document.querySelector(`#${this.type}-projects-list`));
         for (const projectItem of this.assignedProjects) {
-            const listItem = document.createElement('li');
+            const listItem = document.createElement("li");
             listItem.textContent = projectItem.title;
             listElem.appendChild(listItem);
         }
     }
     attachContent() {
         const listId = `${this.type}-projects-list`;
-        this.sectionElement.querySelector('ul').id = listId;
-        this.sectionElement.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+        this.sectionElement.querySelector("ul").id = listId;
+        this.sectionElement.querySelector("h2").textContent =
+            this.type.toUpperCase() + " PROJECTS";
     }
     render() {
         this.hostElement.insertAdjacentElement("beforeend", this.sectionElement);
@@ -162,6 +173,6 @@ __decorate([
     AutoBind
 ], ProjectInput.prototype, "submitHandler", null);
 const projectInput = new ProjectInput();
-const activeProjectList = new ProjectList('active');
-const finishedProjectList = new ProjectList('finished');
+const activeProjectList = new ProjectList("active");
+const finishedProjectList = new ProjectList("finished");
 //# sourceMappingURL=app.js.map
