@@ -32,14 +32,6 @@ class ProjectState extends State {
         super();
         this.projects = [];
     }
-    addProject(title, description, people) {
-        const generatedId = Math.random().toString();
-        const newProject = new Project(generatedId, title, description, people, ProjectStatus.ACTIVE);
-        this.projects.push(newProject);
-        for (const listenerFn of this.listeners) {
-            listenerFn(this.projects.slice());
-        }
-    }
     static getInstance() {
         if (this.instance) {
             return this.instance;
@@ -47,8 +39,13 @@ class ProjectState extends State {
         this.instance = new ProjectState();
         return this.instance;
     }
-    addListeners(listenerFn) {
-        this.listeners.push(listenerFn);
+    addProject(title, description, people) {
+        const generatedId = Math.random().toString();
+        const newProject = new Project(generatedId, title, description, people, ProjectStatus.ACTIVE);
+        this.projects.push(newProject);
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice());
+        }
     }
 }
 const projectState = ProjectState.getInstance();
@@ -97,6 +94,27 @@ class Component {
         this.hostElement.insertAdjacentElement(insertAfterBegin ? "afterbegin" : "beforeend", this.element);
     }
 }
+class ProjectItem extends Component {
+    get persons() {
+        if (this.project.people === 1)
+            return '1 person';
+        else
+            return `${this.project.people} persons`;
+    }
+    constructor(hostId, project) {
+        super("single-project", hostId, false, project.id);
+        this.project = project;
+        this.configure();
+        this.attachContent();
+    }
+    configure() { }
+    attachContent() {
+        this.element.querySelector("h2").textContent = this.project.title;
+        this.element.querySelector("h3").textContent =
+            this.persons + ' assigned';
+        this.element.querySelector("p").textContent = this.project.description;
+    }
+}
 class ProjectList extends Component {
     constructor(type) {
         super("project-list", "app", false, `${type}-projects`);
@@ -116,20 +134,18 @@ class ProjectList extends Component {
             this.renderProjects();
         });
     }
-    renderProjects() {
-        const listElem = (document.querySelector(`#${this.type}-projects-list`));
-        listElem.innerHTML = "";
-        for (const projectItem of this.assignedProjects) {
-            const listItem = document.createElement("li");
-            listItem.textContent = projectItem.title;
-            listElem.appendChild(listItem);
-        }
-    }
     attachContent() {
         const listId = `${this.type}-projects-list`;
         this.element.querySelector("ul").id = listId;
         this.element.querySelector("h2").textContent =
             this.type.toUpperCase() + " PROJECTS";
+    }
+    renderProjects() {
+        const listElem = (document.querySelector(`#${this.type}-projects-list`));
+        listElem.innerHTML = "";
+        for (const projectItem of this.assignedProjects) {
+            new ProjectItem(this.element.querySelector('ul').id, projectItem);
+        }
     }
 }
 class ProjectInput extends Component {
@@ -140,10 +156,10 @@ class ProjectInput extends Component {
         this.peopleInputElement = (this.element.querySelector("#people"));
         this.configure();
     }
-    attachContent() { }
     configure() {
         this.element.addEventListener("submit", this.submitHandler);
     }
+    attachContent() { }
     gatherUserInput() {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
@@ -161,11 +177,14 @@ class ProjectInput extends Component {
             value: +enteredPeople,
             required: true,
             min: 1,
+            max: 5
         };
         if (!validate(titleValidate) ||
             !validate(descriptionValidate) ||
-            !validate(peopleValidate))
+            !validate(peopleValidate)) {
             alert("invalid Inputs");
+            return;
+        }
         else
             return [enteredTitle, enteredDescription, +enteredPeople];
     }

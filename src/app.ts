@@ -1,3 +1,4 @@
+//PROJECT TYPE
 enum ProjectStatus {
   ACTIVE,
   FINISHED,
@@ -13,24 +14,32 @@ class Project {
   ) {}
 }
 
+//PROJECT STATE MANAGEMENT
 type Listener<T> = (items: T[]) => void;
 
 class State<T> {
-    protected listeners: Listener<T>[] = [];
+  protected listeners: Listener<T>[] = [];
 
-    addListeners(listenerFn: Listener<T>) {
-        this.listeners.push(listenerFn);
-      }
+  addListeners(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
 }
 
 //PROJECT STATE MANAGEMENT
 class ProjectState extends State<Project> {
-  
   private projects: Project[] = [];
   private static instance: ProjectState;
 
   constructor() {
     super();
+  }
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
   }
 
   addProject(title: string, description: string, people: number) {
@@ -46,18 +55,6 @@ class ProjectState extends State<Project> {
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
     }
-  }
-
-  static getInstance() {
-    if (this.instance) {
-      return this.instance;
-    }
-    this.instance = new ProjectState();
-    return this.instance;
-  }
-
-  addListeners(listenerFn: Listener<Project>) {
-    this.listeners.push(listenerFn);
   }
 }
 
@@ -152,6 +149,34 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract attachContent(): void;
 }
 
+//PROJECT ITEM CLASS
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+
+  get persons() {
+    if (this.project.people === 1) return '1 person';
+    else return `${this.project.people} persons`
+  }
+
+  constructor(hostId: string, project: Project) {
+    super("single-project", hostId, false, project.id);
+
+    this.project = project;
+
+    this.configure();
+    this.attachContent();
+  }
+
+  configure() {}
+
+  attachContent() {
+    this.element.querySelector("h2")!.textContent = this.project.title;
+    this.element.querySelector("h3")!.textContent =
+      this.persons + ' assigned';
+    this.element.querySelector("p")!.textContent = this.project.description;
+  }
+}
+
 //PROJECT  LIST CLASS
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[];
@@ -176,24 +201,24 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     });
   }
 
-  private renderProjects() {
-    const listElem = <HTMLUListElement>(
-      document.querySelector(`#${this.type}-projects-list`)!
-    );
-    listElem.innerHTML = "";
-    for (const projectItem of this.assignedProjects) {
-      const listItem = document.createElement("li");
-      listItem.textContent = projectItem.title;
-      listElem.appendChild(listItem);
-    }
-  }
-
   attachContent() {
     const listId = `${this.type}-projects-list`;
     this.element.querySelector("ul")!.id = listId;
     this.element.querySelector("h2")!.textContent =
       this.type.toUpperCase() + " PROJECTS";
   }
+
+  private renderProjects() {
+    const listElem = <HTMLUListElement>(
+      document.querySelector(`#${this.type}-projects-list`)!
+    );
+    listElem.innerHTML = "";
+    for (const projectItem of this.assignedProjects) {
+      new ProjectItem(this.element.querySelector('ul')!.id, projectItem);
+    }
+  }
+
+  
 }
 
 //PROJECT INPUT CLASS
@@ -217,11 +242,13 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
     this.configure();
   }
-  attachContent() {}
 
   configure() {
     this.element.addEventListener("submit", this.submitHandler);
   }
+
+  attachContent() {}
+
 
   private gatherUserInput(): [string, string, number] | void {
     const enteredTitle = this.titleInputElement.value;
@@ -241,14 +268,17 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
       value: +enteredPeople,
       required: true,
       min: 1,
+      max: 5
     };
 
     if (
       !validate(titleValidate) ||
       !validate(descriptionValidate) ||
       !validate(peopleValidate)
-    )
+    ){
       alert("invalid Inputs");
+      return
+    }
     else return [enteredTitle, enteredDescription, +enteredPeople];
   }
 
